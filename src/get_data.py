@@ -52,10 +52,9 @@ def data_preparation(data, label):
     #On enregistre tout au format numpy 
     final_matrice = np.array(liste_matrice)
 
-    print(label)
+
     encoder = LabelEncoder()
     label = encoder.fit_transform(label)  # Convertit les catégories en entiers
-
 
     return final_matrice, label
 
@@ -64,72 +63,133 @@ Les données doivent être de la forme (9990, 10, 46) afin de pouvoir effectuer 
 Pour pouvoir avoir les dimensions 9990 en profondeur, nous avons juste à prendre la transposée : final_matrice.T
 '''
 data, label = data_preparation(data, label)
-print(data.shape)
+
 # On split de manière aléatoire nos données : 
 X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(
         data, label, test_size=0.2, random_state=42)
 
-print(X_train.shape)
-print(Y_train.shape)
-
-def RNN( nb_neuronnes : int, nb_couches : int, optimiseur : str):
+def RNN( nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activation : str, batch_size : float):
     # Création du modèle RNN : 
     model = Sequential()
-    ratio = nb_neuronnes/nb_couches
+    ratio = max(1, nb_neuronnes // nb_couches)
     ratio= int(ratio)
+    print(f"Le ratio est de : {ratio}")
     
     model.add(keras.layers.SimpleRNN(nb_neuronnes,input_shape=(X_train.shape[1], X_train.shape[2]), return_sequences=True))
     
     neuronnes = nb_neuronnes
-    for _ in range(nb_couches - 1):
-        neuronnes -= ratio
-        model.add(keras.layers.SimpleRNN(neuronnes, return_sequences=True))
-    
-    neuronnes -= ratio
-    model.add(keras.layers.SimpleRNN(neuronnes, return_sequences=False))
-    model.add(keras.layers.Dense(1, activation="tanh"))
+    for i in range(nb_couches - 1):
+        if neuronnes-ratio <= 0:  # Vérifiez que le nombre de neurones reste valide
+            print("Nombre de neurones trop faible, ajustement à 1.")
+            neuronnes = neuronnes
+            pass
+        else:
+            neuronnes -= ratio
+            model.add(keras.layers.SimpleRNN(neuronnes, return_sequences=True))    
 
+    
+    # Dernière couche RNN avec return_sequences=False
+    if neuronnes-ratio <= 0:
+        neuronnes = neuronnes - int(neuronnes/2)
+    else :
+        neuronnes -= ratio
+    model.add(keras.layers.SimpleRNN(neuronnes, return_sequences=False))
+    model.add(keras.layers.Dense(10, activation=fonction_activation))
+    
     model.summary()
     
-    model.compile(loss="binary_crossentropy",
+    model.compile(loss="sparse_categorical_crossentropy",
                   optimizer=optimiseur, metrics=['accuracy'])
 
-    print(f"Training RNN avec l'optimiseur {optimiseur}...")
+    print(f"Training RNN avec l'optimiseur {optimiseur} et la fonction d'activation {fonction_activation}...")
     
     history = model.fit(X_train, 
                         Y_train, 
                         validation_data=(X_test, Y_test), 
-                        batch_size=5 
-                        )
+                        batch_size=batch_size)
 
 
-RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam')
-RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop')
+# Test optimiseurs et fonctions d'activation :
+'''print("Test des optimiseurs et fonction d'activation ")
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='tanh', batch_size= 5)
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'tanh', batch_size= 5)
 
-'''
-def LSTM():
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'softmax', batch_size = 5)'''
+
+# Test nombre de neuronnes et nombre de couches : en se basant sur les meilleures performances passées 
+'''print("Test du nombre de neuronnes et de couches ")
+RNN(nb_neuronnes = 128, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+RNN(nb_neuronnes = 128, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+RNN(nb_neuronnes = 62, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+RNN(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)'''
+
+# Test du batch size avec celui qui avait fonctionné le mieux :
+'''print("Test des batch size ")
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
+
+# Test croisé 
+#RNN(nb_neuronnes = 250, nb_couches = 25, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
+
+def LSTM(nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activation : str, batch_size : float):
     # Création du modèle RNN : 
     model = Sequential()
-    model.add(keras.layers.LSTM(46,input_shape=(10, 46), return_sequences=False))
-    model.add(keras.layers.LSTM(34, return_sequences=False))
-    model.add(keras.layers.LSTM(22, return_sequences=False))
-    model.add(keras.layers.LSTM(10, return_sequences=False))
-    model.add(keras.layers.Dense(1, activation="sigmoid"))
+    ratio = max(1, nb_neuronnes // nb_couches)
+    ratio= int(ratio)
+    print(f"Le ratio est de : {ratio}")
+    
+    model.add(keras.layers.LSTM(nb_neuronnes,input_shape=(X_train.shape[1], X_train.shape[2]), return_sequences=True))
+    
+    neuronnes = nb_neuronnes
+    for i in range(nb_couches - 1):
+        if neuronnes-ratio <= 0:  # Vérifiez que le nombre de neurones reste valide
+            print("Nombre de neurones trop faible, ajustement à 1.")
+            neuronnes = neuronnes
+            pass
+        else:
+            neuronnes -= ratio
+            model.add(keras.layers.LSTM(neuronnes, return_sequences=True))    
 
+    
+    # Dernière couche RNN avec return_sequences=False
+    if neuronnes-ratio <= 0:
+        neuronnes = neuronnes - int(neuronnes/2)
+    else :
+        neuronnes -= ratio
+    model.add(keras.layers.LSTM(neuronnes, return_sequences=False))
+    model.add(keras.layers.Dense(10, activation=fonction_activation))
+    
     model.summary()
     
-    model.compile(loss="binary_crossentropy",
-                  optimizer='adam', metrics=['accuracy'])
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=optimiseur, metrics=['accuracy'])
 
-    print("Training LSTM...")
-    print(X_train.dtype)  # Devrait être float32 ou float64
-    print(Y_train.dtype)
+    print(f"Training LSTM avec l'optimiseur {optimiseur} et la fonction d'activation {fonction_activation}...")
     
     history = model.fit(X_train, 
                         Y_train, 
                         validation_data=(X_test, Y_test), 
-                        batch_size=5 
-                        )
+                        batch_size=batch_size)
 
-    
-LSTM()'''
+# Test optimiseurs et fonctions d'activation :
+'''print("Test des optimiseurs et fonctions d'activation ")
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='tanh', batch_size= 5)
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'tanh', batch_size= 5)
+
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'softmax', batch_size = 5)'''
+
+# Test nombre de neuronnes et nombre de couches : en se basant sur les meilleures performances passées 
+'''print("Test du nombre de neuronnes et des couches ")
+LSTM(nb_neuronnes = 128, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+LSTM(nb_neuronnes = 128, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+LSTM(nb_neuronnes = 62, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+LSTM(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+
+# Test du batch size avec celui qui avait fonctionné le mieux :
+print("Test des batch size ")
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
