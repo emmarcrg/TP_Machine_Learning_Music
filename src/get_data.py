@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
 import sklearn
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
 import tensorflow.keras as keras
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
-from sklearn.preprocessing import LabelEncoder
+
 #Les messages d'erreurs d'importation de tensorflow.keras ne sont pas à prendre en compte : 
 # l'importation est fait "parésseusement" donc l'appelse fait seulement lorsque nous avons besoin des imports
 
@@ -44,6 +46,13 @@ def data_preparation(data, label):
     liste_matrice = []
     matrice = np.array([])
     
+    # Initialisation du scaler
+    scaler = StandardScaler()
+
+    # Normalisation des données
+    data_normalized = scaler.fit_transform(data)
+    data = pd.DataFrame(data_normalized)
+    
     for i in range(0, len(data)):
         #Je récupère les valeurs de chaque ligne et je les mets dans une matrice
         matrice = np.array([data.iloc[i].values for _ in range(10)])
@@ -52,9 +61,9 @@ def data_preparation(data, label):
     #On enregistre tout au format numpy 
     final_matrice = np.array(liste_matrice)
 
-
+    #Mettre l'ensemble des données des labels au format entier
     encoder = LabelEncoder()
-    label = encoder.fit_transform(label)  # Convertit les catégories en entiers
+    label = encoder.fit_transform(label)  
 
     return final_matrice, label
 
@@ -63,6 +72,7 @@ Les données doivent être de la forme (9990, 10, 46) afin de pouvoir effectuer 
 Pour pouvoir avoir les dimensions 9990 en profondeur, nous avons juste à prendre la transposée : final_matrice.T
 '''
 data, label = data_preparation(data, label)
+print(data.shape)
 
 # On split de manière aléatoire nos données : 
 X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(
