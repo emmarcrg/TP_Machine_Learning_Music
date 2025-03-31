@@ -69,20 +69,32 @@ print(data.shape)
 X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(
         data, label, test_size=0.2, random_state=42)
 
-def RNN():
+print(X_train.shape)
+print(Y_train.shape)
+
+def RNN( nb_neuronnes : int, nb_couches : int, optimiseur : str):
     # Création du modèle RNN : 
     model = Sequential()
-    model.add(keras.layers.SimpleRNN(64,input_shape=(10, 46), return_sequences=False))
-    model.add(keras.layers.Dense(1, activation="sigmoid"))
+    ratio = nb_neuronnes/nb_couches
+    ratio= int(ratio)
+    
+    model.add(keras.layers.SimpleRNN(nb_neuronnes,input_shape=(X_train.shape[1], X_train.shape[2]), return_sequences=True))
+    
+    neuronnes = nb_neuronnes
+    for _ in range(nb_couches - 1):
+        neuronnes -= ratio
+        model.add(keras.layers.SimpleRNN(neuronnes, return_sequences=True))
+    
+    neuronnes -= ratio
+    model.add(keras.layers.SimpleRNN(neuronnes, return_sequences=False))
+    model.add(keras.layers.Dense(1, activation="tanh"))
 
     model.summary()
     
     model.compile(loss="binary_crossentropy",
-                  optimizer='adam', metrics=['accuracy'])
+                  optimizer=optimiseur, metrics=['accuracy'])
 
-    print("Training RNN...")
-    print(X_train.dtype)  # Devrait être float32 ou float64
-    print(Y_train.dtype)
+    print(f"Training RNN avec l'optimiseur {optimiseur}...")
     
     history = model.fit(X_train, 
                         Y_train, 
@@ -90,14 +102,18 @@ def RNN():
                         batch_size=5 
                         )
 
-    
-RNN()
 
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam')
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop')
 
+'''
 def LSTM():
     # Création du modèle RNN : 
     model = Sequential()
-    model.add(keras.layers.LSTM(64,input_shape=(10, 46), return_sequences=False))
+    model.add(keras.layers.LSTM(46,input_shape=(10, 46), return_sequences=False))
+    model.add(keras.layers.LSTM(34, return_sequences=False))
+    model.add(keras.layers.LSTM(22, return_sequences=False))
+    model.add(keras.layers.LSTM(10, return_sequences=False))
     model.add(keras.layers.Dense(1, activation="sigmoid"))
 
     model.summary()
@@ -116,4 +132,4 @@ def LSTM():
                         )
 
     
-LSTM()
+LSTM()'''
