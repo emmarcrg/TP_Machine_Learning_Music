@@ -1,6 +1,8 @@
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 import sklearn
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 import tensorflow.keras as keras
@@ -41,6 +43,7 @@ Les données sur 30 secondes correspondent à toutes les données
 Les données toutes les 3 secondes seront celles à utiliser puisqu'elle décomposent les valeurs des features en 9 parties
 temporatilté sur 9 parties de 3 secondes 
 '''
+encoder = LabelEncoder()
 def data_preparation(data, label):
     # On prépare les données sous forme de matrices pour pouvoir les enregistrées dans notre tableau numpy
     liste_matrice = []
@@ -62,7 +65,6 @@ def data_preparation(data, label):
     final_matrice = np.array(liste_matrice)
 
     #Mettre l'ensemble des données des labels au format entier
-    encoder = LabelEncoder()
     label = encoder.fit_transform(label)  
 
     return final_matrice, label
@@ -117,6 +119,8 @@ def RNN( nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activa
                         Y_train, 
                         validation_data=(X_test, Y_test), 
                         batch_size=batch_size)
+    
+    return model
 
 
 # Test optimiseurs et fonctions d'activation :
@@ -182,6 +186,8 @@ def LSTM(nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activa
                         Y_train, 
                         validation_data=(X_test, Y_test), 
                         batch_size=batch_size)
+    
+    return model
 
 # Test optimiseurs et fonctions d'activation :
 '''print("Test des optimiseurs et fonctions d'activation ")
@@ -203,3 +209,26 @@ print("Test des batch size ")
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
+
+def analyse_erreur_RNN ():
+    RNN_model = RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+    y_pred = RNN_model.predict(X_test)
+    y_pred_classes = np.argmax(y_pred, axis=1)
+    
+    mc = confusion_matrix(Y_test, y_pred_classes)
+    cm_display = ConfusionMatrixDisplay(confusion_matrix=mc, display_labels=encoder.classes_)
+    cm_display.plot()
+    plt.show()
+    
+def analyse_erreur_LSTM ():
+    RNN_model = LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+    y_pred = RNN_model.predict(X_test)
+    y_pred_classes = np.argmax(y_pred, axis=1)
+    
+    mc = confusion_matrix(Y_test, y_pred_classes)
+    cm_display = ConfusionMatrixDisplay(confusion_matrix=mc, display_labels=encoder.classes_)
+    cm_display.plot()
+    plt.show()
+    
+analyse_erreur_RNN()
+analyse_erreur_LSTM()
