@@ -23,7 +23,7 @@ def get_data(link):
     return data
 
 data=get_data(link1)
-#print(data)
+print(data)
 
 def data_treatment (data):
     #On enregistre les labels dans une variable extérieur
@@ -36,7 +36,8 @@ def data_treatment (data):
     return data, label
 
 data, label=data_treatment(data)
-#print(data)
+print(data)
+
 
 '''
 Les données sur 30 secondes correspondent à toutes les données
@@ -44,6 +45,7 @@ Les données toutes les 3 secondes seront celles à utiliser puisqu'elle décomp
 temporatilté sur 9 parties de 3 secondes 
 '''
 encoder = LabelEncoder()
+
 def data_preparation(data, label):
     # On prépare les données sous forme de matrices pour pouvoir les enregistrées dans notre tableau numpy
     liste_matrice = []
@@ -74,7 +76,9 @@ Les données doivent être de la forme (9990, 10, 46) afin de pouvoir effectuer 
 Pour pouvoir avoir les dimensions 9990 en profondeur, nous avons juste à prendre la transposée : final_matrice.T
 '''
 data, label = data_preparation(data, label)
+print(label)
 print(data.shape)
+print(label.shape)
 
 # On split de manière aléatoire nos données : 
 X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(
@@ -124,25 +128,25 @@ def RNN( nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activa
 
 
 # Test optimiseurs et fonctions d'activation :
-'''print("Test des optimiseurs et fonction d'activation ")
+print("Test des optimiseurs et fonction d'activation ")
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='tanh', batch_size= 5)
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'tanh', batch_size= 5)
 
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
-RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'softmax', batch_size = 5)'''
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'softmax', batch_size = 5)
 
 # Test nombre de neuronnes et nombre de couches : en se basant sur les meilleures performances passées 
-'''print("Test du nombre de neuronnes et de couches ")
+print("Test du nombre de neuronnes et de couches ")
 RNN(nb_neuronnes = 128, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
 RNN(nb_neuronnes = 128, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
 RNN(nb_neuronnes = 62, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
-RNN(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)'''
+RNN(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
 
 # Test du batch size avec celui qui avait fonctionné le mieux :
-'''print("Test des batch size ")
+print("Test des batch size ")
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
-RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)
 
 # Test croisé 
 #RNN(nb_neuronnes = 250, nb_couches = 25, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
@@ -190,15 +194,15 @@ def LSTM(nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activa
     return model
 
 # Test optimiseurs et fonctions d'activation :
-'''print("Test des optimiseurs et fonctions d'activation ")
+print("Test des optimiseurs et fonctions d'activation ")
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='tanh', batch_size= 5)
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'tanh', batch_size= 5)
 
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
-LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'softmax', batch_size = 5)'''
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'softmax', batch_size = 5)
 
 # Test nombre de neuronnes et nombre de couches : en se basant sur les meilleures performances passées 
-'''print("Test du nombre de neuronnes et des couches ")
+print("Test du nombre de neuronnes et des couches ")
 LSTM(nb_neuronnes = 128, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
 LSTM(nb_neuronnes = 128, nb_couches = 8, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
 LSTM(nb_neuronnes = 62, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
@@ -208,7 +212,7 @@ LSTM(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='
 print("Test des batch size ")
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
-LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)
 
 def analyse_erreur_RNN ():
     RNN_model = RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
