@@ -128,7 +128,7 @@ def RNN( nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activa
 
 
 # Test optimiseurs et fonctions d'activation :
-print("Test des optimiseurs et fonction d'activation ")
+'''print("Test des optimiseurs et fonction d'activation ")
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='tanh', batch_size= 5)
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'tanh', batch_size= 5)
 
@@ -146,7 +146,7 @@ RNN(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='s
 print("Test des batch size ")
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
 RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
-RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)
+RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
 
 # Test croisé 
 #RNN(nb_neuronnes = 250, nb_couches = 25, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
@@ -194,7 +194,7 @@ def LSTM(nb_neuronnes : int, nb_couches : int, optimiseur : str, fonction_activa
     return model
 
 # Test optimiseurs et fonctions d'activation :
-print("Test des optimiseurs et fonctions d'activation ")
+'''print("Test des optimiseurs et fonctions d'activation ")
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='tanh', batch_size= 5)
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur = 'RMSprop', fonction_activation = 'tanh', batch_size= 5)
 
@@ -212,7 +212,7 @@ LSTM(nb_neuronnes = 62, nb_couches = 8, optimiseur='adam', fonction_activation='
 print("Test des batch size ")
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 10)
 LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 20)
-LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)
+LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 100)'''
 
 def analyse_erreur_RNN ():
     RNN_model = RNN(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
@@ -225,8 +225,8 @@ def analyse_erreur_RNN ():
     plt.show()
     
 def analyse_erreur_LSTM ():
-    RNN_model = LSTM(nb_neuronnes = 46, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
-    y_pred = RNN_model.predict(X_test)
+    LSTM_model = LSTM(nb_neuronnes = 128, nb_couches = 4, optimiseur='adam', fonction_activation='softmax', batch_size = 5)
+    y_pred = LSTM_model.predict(X_test)
     y_pred_classes = np.argmax(y_pred, axis=1)
     
     mc = confusion_matrix(Y_test, y_pred_classes)
